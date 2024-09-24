@@ -3,31 +3,33 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-def load_and_visualize():
-    df = pd.read_csv("medical_examination.csv")
+df = pd.read_csv('medical_examination.csv')
 
-    df['overweight'] = (df['weight'] / ((df['height'] / 100) ** 2) > 25).astype(int)
+df['overweight'] = (df['weight'] / (df['height'] / 100) ** 2).apply(lambda x: 1 if x > 25 else 0)
 
-    df['cholesterol'] = df['cholesterol'].apply(lambda x: 0 if x == 1 else 1)
-    df['gluc'] = df['gluc'].apply(lambda x: 0 if x == 1 else 1)
+df['cholesterol'] = df['cholesterol'].apply(lambda x: 0 if x == 1 else 1)
+df['gluc'] = df['gluc'].apply(lambda x: 0 if x == 1 else 1)
 
-    return df
+def draw_cat_plot():
+    df_cat = pd.melt(df, id_vars='cardio', value_vars=['cholesterol', 'gluc', 'smoke', 'alco', 'active', 'overweight'])
 
-def draw_cat_plot(df):
-    df_cat = pd.melt(df, id_vars=["cardio"], value_vars=["cholesterol", "gluc", "smoke", "alco", "active", "overweight"])
+    df_cat = df_cat.groupby(['cardio', 'variable', 'value']).size().reset_index(name='total')
+    
+    graph = sns.catplot(x='variable', y='total', hue='value', col='cardio', data=df_cat, kind='bar')
 
-    df_cat = df_cat.groupby(["cardio", "variable", "value"], as_index=False).size()
+    graph.set_axis_labels("variable", "total")
+    fig = graph.figure
 
-    fig = sns.catplot(x="variable", hue="value", col="cardio", data=df_cat, kind="count", height=5, aspect=1).fig
-
+    fig.savefig('catplot.png')
     return fig
 
-def draw_heat_map(df):
+def draw_heat_map():
+
     df_heat = df[
-        (df['ap_lo'] <= df['ap_hi']) &
+        (df['ap_lo'] <= df['ap_hi']) & 
         (df['height'] >= df['height'].quantile(0.025)) & 
-        (df['height'] <= df['height'].quantile(0.975)) &
-        (df['weight'] >= df['weight'].quantile(0.025)) &
+        (df['height'] <= df['height'].quantile(0.975)) & 
+        (df['weight'] >= df['weight'].quantile(0.025)) & 
         (df['weight'] <= df['weight'].quantile(0.975))
     ]
 
@@ -35,17 +37,18 @@ def draw_heat_map(df):
 
     mask = np.triu(np.ones_like(corr, dtype=bool))
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize = (12, 12))
 
-    sns.heatmap(corr, annot=True, fmt='.1f', mask=mask, square=True, cmap='coolwarm', cbar_kws={"shrink": 0.5})
+    sns.heatmap(corr,
+        annot=True,
+        mask=mask,
+        fmt='.1f',
+        center=0,
+        square=True,
+        linewidths=.5,
+        cbar_kws={'shrink': .5},
+        ax=ax
+    )
 
+    fig.savefig('heatmap.png')
     return fig
-
-if __name__ == "__main__":
-    df = load_and_visualize()
-
-    fig_cat = draw_cat_plot(df)
-    fig_cat.savefig('catplot.png')
-
-    fig_heat = draw_heat_map(df)
-    fig_heat.savefig('heatmap.png')

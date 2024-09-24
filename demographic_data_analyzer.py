@@ -2,30 +2,33 @@ import pandas as pd
 
 
 def calculate_demographic_data(print_data=True):
-    df = None
+    df = pd.read_csv('adult.data.csv')
 
-    race_count = None
+    race_count = df['race'].value_counts()
 
-    average_age_men = None
+    average_age_men = round(df[df['sex'] == 'Male']['age'].mean(), 1)
+    
+    percentage_bachelors = round((df['education'] == 'Bachelors').mean() * 100, 1)
 
-    percentage_bachelors = None
+    higher_education = df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])
+    higher_education_rich = round((df[higher_education]['salary'] == '>50K').mean() * 100, 1)
 
-    higher_education = None
-    lower_education = None
+    lower_education = ~higher_education
+    lower_education_rich = round((df[lower_education]['salary'] == '>50K').mean() * 100, 1)
 
-    higher_education_rich = None
-    lower_education_rich = None
+    min_work_hours = df['hours-per-week'].min()
 
-    min_work_hours = None
+    num_min_workers = df[df['hours-per-week'] == min_work_hours]
+    rich_percentage = round((num_min_workers['salary'] == '>50K').mean() * 100, 1)
 
-    num_min_workers = None
+    country_salary = df.groupby('native-country')['salary'].value_counts(normalize=True).unstack(fill_value=0)
+    country_salary_percentage = round((country_salary['>50K'] / country_salary.sum(axis=1)) * 100, 1)
+    
+    highest_earning_country_percentage = country_salary_percentage.max()
+    highest_earning_country = country_salary_percentage.idxmax()
 
-    rich_percentage = None
+    top_IN_occupation = df[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].mode()[0]
 
-    highest_earning_country = None
-    highest_earning_country_percentage = None
-
-    top_IN_occupation = None
 
     if print_data:
         print("Number of each race:\n", race_count) 
