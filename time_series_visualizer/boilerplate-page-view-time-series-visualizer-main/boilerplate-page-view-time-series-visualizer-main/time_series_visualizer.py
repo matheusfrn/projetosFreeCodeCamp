@@ -6,7 +6,6 @@ register_matplotlib_converters()
 
 df = pd.read_csv('fcc-forum-pageviews.csv', index_col='date', parse_dates=True)
 
-# Remove dados fora do range de 2.5% a 97.5%
 df = df[
     (df['value'] >= df['value'].quantile(0.025)) &
     (df['value'] <= df['value'].quantile(0.975))
@@ -14,7 +13,6 @@ df = df[
 
 
 def draw_line_plot():
-    # Configurações do plot
     fig, ax = plt.subplots(figsize=(20, 5))
     ax.plot(df['value'])
     
@@ -27,12 +25,10 @@ def draw_line_plot():
 
 
 def draw_bar_plot():
-    # Modifica o dataframe para agrupar dados de ano e mês
     df_bar = df.copy()
     df_bar['year'] = df_bar.index.year
     df_bar['month'] = df_bar.index.month_name()
 
-    # Calcula a média e separa os valores dos grupos em colunas
     df_bar = df_bar.groupby(['year', 'month'])['value'].mean().unstack()
 
     fig = df_bar.plot(kind='bar', figsize=(12, 6), legend=True).figure
@@ -44,7 +40,6 @@ def draw_bar_plot():
         'July', 'August', 'September', 'October', 'November', 'December'
     ], bbox_to_anchor=(1.05, 1), loc='upper left')
 
-    # Ajusta o layout para evitar que as barras sejam cortadas
     plt.tight_layout()
 
     fig.savefig('bar_plot.png')
@@ -60,7 +55,6 @@ def draw_box_plot():
     fig, axs = plt.subplots(1, 2, figsize=(10, 7))
     months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-    # Garante a categorização da coluna mês na ordem estabelecida
     df_box['month'] = pd.Categorical(df_box['month'], categories=months, ordered=True)
     
     sns.boxplot(x=df_box['year'], y=df_box['value'], ax=axs[0])
