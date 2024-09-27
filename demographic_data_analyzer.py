@@ -1,36 +1,34 @@
 import pandas as pd
 
+
 def calculate_demographic_data(print_data=True):
-    df = pd.read_csv('adult.data.csv')
+    df = None
 
-    race_count = df['race'].value_counts()
+    race_count = None
 
-    average_age_men = round(df[df['sex'] == 'Male']['age'].mean(), 1)
+    average_age_men = None
 
-    total_people = len(df)
-    bachelors_count = len(df[df['education'] == 'Bachelors'])
-    percentage_bachelors = round((bachelors_count / total_people) * 100, 1)
+    percentage_bachelors = None
 
-    higher_education = df[df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])]
-    higher_education_rich = round((len(higher_education[higher_education['salary'] == '>50K']) / len(higher_education)) * 100, 1)
+    higher_education = None
+    lower_education = None
 
-    lower_education = df[~df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])]
-    lower_education_rich = round((len(lower_education[lower_education['salary'] == '>50K']) / len(lower_education)) * 100, 1)
+    higher_education_rich = None
+    lower_education_rich = None
 
-    min_work_hours = df['hours-per-week'].min()
+    min_work_hours = None
 
-    num_min_workers = df[df['hours-per-week'] == min_work_hours]
-    rich_percentage = round((len(num_min_workers[num_min_workers['salary'] == '>50K']) / len(num_min_workers)) * 100, 1)
+    num_min_workers = None
 
-    countries_rich = df[df['salary'] == '>50K']['native-country'].value_counts()
-    countries_total = df['native-country'].value_counts()
-    highest_earning_country = (countries_rich / countries_total * 100).idxmax()
-    highest_earning_country_percentage = round((countries_rich / countries_total * 100).max(), 1)
+    rich_percentage = None
 
-    top_IN_occupation = df[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].value_counts().idxmax()
+    highest_earning_country = None
+    highest_earning_country_percentage = None
+
+    top_IN_occupation = None
 
     if print_data:
-        print("Number of each race:\n", race_count)
+        print("Number of each race:\n", race_count) 
         print("Average age of men:", average_age_men)
         print(f"Percentage with Bachelors degrees: {percentage_bachelors}%")
         print(f"Percentage with higher education that earn >50K: {higher_education_rich}%")
@@ -50,6 +48,7 @@ def calculate_demographic_data(print_data=True):
         'min_work_hours': min_work_hours,
         'rich_percentage': rich_percentage,
         'highest_earning_country': highest_earning_country,
-        'highest_earning_country_percentage': highest_earning_country_percentage,
+        'highest_earning_country_percentage':
+        highest_earning_country_percentage,
         'top_IN_occupation': top_IN_occupation
     }
